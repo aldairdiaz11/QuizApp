@@ -6,4 +6,5 @@
     <string name="name">name</string>
     <string name="btn_start">Start</string>
     <string name="quiz_image">Quiz Image</string>
+    <string name="barPro">0/9</string>
 </resources>
