@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 
 class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
@@ -62,6 +63,9 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     private fun setQuestion() {
 
         val question: Question = absQuestionsList!![absCurrentPosition - 1]
+
+        defaultOptionsView()
+
         tvImage?.setImageResource(question.image)
         progressBar?.progress = absCurrentPosition
         tvProgress?.text = "$absCurrentPosition / ${progressBar?.max}"
@@ -102,19 +106,7 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun selectedOptionView(tv: TextView, optNum: Int) {
-        defaultOptionsView()
-        absSelectedOptPos = optNum
-
-        tv.setTextColor(Color.parseColor("#363A43"))
-        tv.setTypeface(tv.typeface, Typeface.BOLD)
-        tv.background = ContextCompat.getDrawable(
-            this,
-            R.drawable.selected_option_border_bg
-        )
-
-    }
-
+    @SuppressLint("SetTextI18n")
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.tv_option_one -> {
@@ -143,8 +135,76 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.btn_submit -> {
-                // todo "implement btn submit"
+                if(absSelectedOptPos == 0){
+                    absCurrentPosition ++
+
+                    when{
+                        absCurrentPosition <= absQuestionsList!!.size -> {
+                            setQuestion()
+                        } else -> {
+                            Toast.makeText(this
+                                ,
+                                "Congrats, you made it!",
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    val question = absQuestionsList?.get(absCurrentPosition - 1)
+
+                    if(question!!.correctAnswer != absSelectedOptPos) {
+                        answerView(absSelectedOptPos, R.drawable.wrong_option_border_bg)
+                    }
+                    answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
+
+                    if(absCurrentPosition == absQuestionsList!!.size) {
+                        btnSubmit?.text = "Finish"
+                    } else {
+                        btnSubmit?.text = "Go to next question"
+                    }
+
+                    absSelectedOptPos = 0
+                }
             }
         }
+    }
+    private fun answerView(answer: Int, drawableView: Int) {
+        when(answer) {
+            1 ->{
+                tvOptionOne?.background = ContextCompat.getDrawable(
+                    this,
+                    drawableView
+                )
+            }
+            2 ->{
+                tvOptionTwo?.background = ContextCompat.getDrawable(
+                    this,
+                    drawableView
+                )
+            }
+            3 ->{
+                tvOptionThree?.background = ContextCompat.getDrawable(
+                    this,
+                    drawableView
+                )
+            }
+            4 ->{
+                tvOptionFour?.background = ContextCompat.getDrawable(
+                    this,
+                    drawableView
+                )
+            }
+        }
+    }
+    private fun selectedOptionView(tv: TextView, optNum: Int) {
+        defaultOptionsView()
+        absSelectedOptPos = optNum
+
+        tv.setTextColor(Color.parseColor("#363A43"))
+        tv.setTypeface(tv.typeface, Typeface.BOLD)
+        tv.background = ContextCompat.getDrawable(
+            this,
+            R.drawable.selected_option_border_bg
+        )
+
     }
 }

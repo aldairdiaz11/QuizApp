@@ -40,7 +40,7 @@ object Constants {
             questionsList.add(
                 Question(
                     index + 1, questionStatement, flag, optOne, optTwo, optThree, optFour,
-                    answers[index]
+                    answers[index] + 1
                 )
             )
         }
