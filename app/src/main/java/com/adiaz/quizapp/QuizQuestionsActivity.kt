@@ -76,9 +76,7 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         tvOptionThree?.text = question.OptionThree
         tvOptionFour?.text = question.OptionFour
 
-        if (absCurrentPosition == absQuestionsList!!.size) {
-            btnSubmit?.text = "FINISH"
-        }
+        btnSubmit?.text = "SUBMIT"
     }
 
     private fun defaultOptionsView() {
