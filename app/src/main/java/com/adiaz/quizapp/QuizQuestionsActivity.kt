@@ -1,6 +1,7 @@
 package com.adiaz.quizapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +11,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 
 class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
@@ -18,6 +18,8 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     private var absCurrentPosition: Int = 1
     private var absQuestionsList: ArrayList<Question>? = null
     private var absSelectedOptPos: Int = 0
+    private var absUserName: String? = null
+    private var absCorrectAnswers: Int = 0
 
     private var progressBar: ProgressBar? = null
     private var tvProgress: TextView? = null
@@ -35,6 +37,8 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_questions)
+
+        absUserName = intent.getStringExtra(Constants.USER_NAME)
 
         progressBar = findViewById(R.id.tv_progress_bar)
         tvProgress = findViewById(R.id.tv_progress)
@@ -133,28 +137,35 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.btn_submit -> {
-                if(absSelectedOptPos == 0){
-                    absCurrentPosition ++
+                if (absSelectedOptPos == 0) {
+                    absCurrentPosition++
 
-                    when{
+                    when {
                         absCurrentPosition <= absQuestionsList!!.size -> {
                             setQuestion()
-                        } else -> {
-                            Toast.makeText(this
-                                ,
-                                "Congrats, you made it!",
-                                Toast.LENGTH_SHORT).show()
+                        }
+
+                        else -> {
+                            // Lunch result activity
+                            val intent = Intent(this, ResultActivity::class.java)
+                            intent.putExtra(Constants.USER_NAME, absUserName)
+                            intent.putExtra(Constants.CORRECT_ANSWERS, absCorrectAnswers)
+                            intent.putExtra(Constants.TOTAL_QUESTIONS, absQuestionsList?.size)
+                            startActivity(intent)
+                            finish()
                         }
                     }
                 } else {
                     val question = absQuestionsList?.get(absCurrentPosition - 1)
 
-                    if(question!!.correctAnswer != absSelectedOptPos) {
+                    if (question!!.correctAnswer != absSelectedOptPos) {
                         answerView(absSelectedOptPos, R.drawable.wrong_option_border_bg)
+                    } else {
+                        absCorrectAnswers ++
                     }
                     answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
 
-                    if(absCurrentPosition == absQuestionsList!!.size) {
+                    if (absCurrentPosition == absQuestionsList!!.size) {
                         btnSubmit?.text = "Finish"
                     } else {
                         btnSubmit?.text = "Go to next question"
@@ -165,27 +176,31 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
     }
+
     private fun answerView(answer: Int, drawableView: Int) {
-        when(answer) {
-            1 ->{
+        when (answer) {
+            1 -> {
                 tvOptionOne?.background = ContextCompat.getDrawable(
                     this,
                     drawableView
                 )
             }
-            2 ->{
+
+            2 -> {
                 tvOptionTwo?.background = ContextCompat.getDrawable(
                     this,
                     drawableView
                 )
             }
-            3 ->{
+
+            3 -> {
                 tvOptionThree?.background = ContextCompat.getDrawable(
                     this,
                     drawableView
                 )
             }
-            4 ->{
+
+            4 -> {
                 tvOptionFour?.background = ContextCompat.getDrawable(
                     this,
                     drawableView
@@ -193,6 +208,7 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
     }
+
     private fun selectedOptionView(tv: TextView, optNum: Int) {
         defaultOptionsView()
         absSelectedOptPos = optNum
